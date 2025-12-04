@@ -14,36 +14,40 @@ INSTALL_MQTT=0
 INSTALL_MC=0
 
 echo "Mit szeretnél telepíteni?"
-echo "  0 - MINDENT"
-echo "  1 - Node-RED"
-echo "  2 - Apache2 + MariaDB + PHP + phpMyAdmin"
-echo "  3 - MQTT szerver (Mosquitto)"
-echo "  4 - mc"
-read -rp "Választás (pl. 0 vagy 1 2 3 4): " CHOICES </dev/tty || CHOICES=""
+echo "  1 - MINDENT telepít (Node-RED, LAMP, MQTT, mc)"
+echo "  2 - Node-RED"
+echo "  3 - Apache2 + MariaDB + PHP + phpMyAdmin"
+echo "  4 - MQTT szerver (Mosquitto)"
+echo "  5 - mc"
 
-if echo "$CHOICES" | grep -qw "0"; then
-  INSTALL_NODE_RED=1
-  INSTALL_LAMP=1
-  INSTALL_MQTT=1
-  INSTALL_MC=1
-fi
+read -rp "Választás (pl. 1 vagy 2 4 5): " CHOICES </dev/tty || CHOICES=""
 
 for c in $CHOICES; do
   case "$c" in
-    1) INSTALL_NODE_RED=1 ;;
-    2) INSTALL_LAMP=1 ;;
-    3) INSTALL_MQTT=1 ;;
-    4) INSTALL_MC=1 ;;
+    1)
+      INSTALL_NODE_RED=1
+      INSTALL_LAMP=1
+      INSTALL_MQTT=1
+      INSTALL_MC=1
+      ;;
+    2) INSTALL_NODE_RED=1 ;;
+    3) INSTALL_LAMP=1 ;;
+    4) INSTALL_MQTT=1 ;;
+    5) INSTALL_MC=1 ;;
+    *) echo "Ismeretlen opció: $c, kihagyva." ;;
   esac
 done
 
 if [[ $INSTALL_NODE_RED -eq 0 && $INSTALL_LAMP -eq 0 && $INSTALL_MQTT -eq 0 && $INSTALL_MC -eq 0 ]]; then
+  echo "Nem választottál semmit, kilépek."
   exit 0
 fi
 
+# Frissítés és alap csomagok
 apt-get update -y && apt-get upgrade -y
 apt-get install -y curl wget unzip ca-certificates gnupg lsb-release
 
+# Node-RED telepítés
 if [[ $INSTALL_NODE_RED -eq 1 ]]; then
   if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
     npm install -g --unsafe-perm node-red
@@ -69,6 +73,7 @@ UNIT
   fi
 fi
 
+# LAMP telepítés
 if [[ $INSTALL_LAMP -eq 1 ]]; then
   apt-get install -y apache2 mariadb-server php libapache2-mod-php php-mysql \
     php-mbstring php-zip php-gd php-json php-curl
@@ -118,6 +123,7 @@ PHPCONF
   systemctl reload apache2
 fi
 
+# MQTT telepítés
 if [[ $INSTALL_MQTT -eq 1 ]]; then
   apt-get install -y mosquitto mosquitto-clients
   mkdir -p /etc/mosquitto/conf.d
@@ -129,6 +135,7 @@ MQTTCONF
   systemctl restart mosquitto
 fi
 
+# mc telepítés
 if [[ $INSTALL_MC -eq 1 ]]; then
   apt-get install -y mc
 fi
