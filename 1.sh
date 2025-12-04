@@ -15,13 +15,13 @@ INSTALL_LAMP=0
 INSTALL_MQTT=0
 INSTALL_MC=0
 
-# Színes menü
 echo -e "\e[36mMit szeretnél telepíteni? (több opció is választható szóközzel)\e[0m"
-echo -e "  \e[32m1\e[0m - MINDENT telepít (Node-RED, LAMP, MQTT, mc)"
+echo -e "  \e[32m1\e[0m - MINDENT telepít"
 echo -e "  \e[33m2\e[0m - Node-RED"
 echo -e "  \e[34m3\e[0m - Apache2 + MariaDB + PHP + phpMyAdmin"
 echo -e "  \e[35m4\e[0m - MQTT szerver (Mosquitto)"
 echo -e "  \e[36m5\e[0m - mc"
+
 
 read -rp $'\e[37mVálasztás (pl. 1 vagy 2 4 5): \e[0m' CHOICES </dev/tty || CHOICES=""
 
