@@ -15,7 +15,7 @@ INSTALL_LAMP=0
 INSTALL_MQTT=0
 INSTALL_MC=0
 
-echo -e "\e[36mMit szeretnél telepíteni? (több opció is választható szóközzel)\e[0m"
+echo -e "\e[36mMit szeretnél telepíteni? \e[0m"
 echo -e "  \e[32m1\e[0m - MINDENT telepít"
 echo -e "  \e[33m2\e[0m - Node-RED"
 echo -e "  \e[34m3\e[0m - Apache2 + MariaDB + PHP + phpMyAdmin"
