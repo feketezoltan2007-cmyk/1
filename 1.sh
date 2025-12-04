@@ -3,12 +3,11 @@
 RED='\033[1;31m'
 GREEN='\033[1;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[1;34m'
 NC='\033[0m'
 
 CHECK="${GREEN}[OK]${NC}"
 ERR="${RED}[ERR]${NC}"
-INFO="${BLUE}[INFO]${NC}"
+INFO="${YELLOW}[INFO]${NC}"
 
 set -e
 export DEBIAN_FRONTEND=noninteractive
@@ -18,7 +17,7 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-echo -e "${YELLOW}Mit szeretnél telepíteni?${NC}"
+echo -e "${INFO} Mit szeretnél telepíteni?"
 echo -e "  1 - Node-RED"
 echo -e "  2 - Apache2 + MariaDB + PHP + phpMyAdmin"
 echo -e "  3 - MQTT (Mosquitto)"
@@ -45,15 +44,8 @@ for c in $CHOICES; do
     2) LAMP=1 ;;
     3) MQTT=1 ;;
     4) MC=1 ;;
-    5) ;;
-    *) echo -e "${YELLOW}[!] Ismeretlen opció: $c${NC}" ;;
   esac
 done
-
-if [[ $NODE_RED -eq 0 && $LAMP -eq 0 && $MQTT -eq 0 && $MC -eq 0 ]]; then
-  echo -e "${ERR} Nem választottál semmit."
-  exit 0
-fi
 
 echo -e "${GREEN}Telepítés befejezve.${NC}"
 exit 0
