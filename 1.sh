@@ -3,47 +3,53 @@
 set -e
 export DEBIAN_FRONTEND=noninteractive
 
+# Ellenőrzés, hogy root-e
 if [[ $EUID -ne 0 ]]; then
-  echo "Ezt a scriptet rootként kell futtatni!"
+  echo -e "\e[31mEzt a scriptet rootként kell futtatni!\e[0m"
   exit 1
 fi
 
+# Opciók alapértelmezett értékei
 INSTALL_NODE_RED=0
 INSTALL_LAMP=0
 INSTALL_MQTT=0
 INSTALL_MC=0
 
-echo "Mit szeretnél telepíteni?"
-echo "  1 - MINDENT telepít (Node-RED, LAMP, MQTT, mc)"
-echo "  2 - Node-RED"
-echo "  3 - Apache2 + MariaDB + PHP + phpMyAdmin"
-echo "  4 - MQTT szerver (Mosquitto)"
-echo "  5 - mc"
+# Színes menü
+echo -e "\e[36mMit szeretnél telepíteni? (több opció is választható szóközzel)\e[0m"
+echo -e "  \e[32m1\e[0m - MINDENT telepít (Node-RED, LAMP, MQTT, mc)"
+echo -e "  \e[33m2\e[0m - Node-RED"
+echo -e "  \e[34m3\e[0m - Apache2 + MariaDB + PHP + phpMyAdmin"
+echo -e "  \e[35m4\e[0m - MQTT szerver (Mosquitto)"
+echo -e "  \e[36m5\e[0m - mc"
 
-read -rp "Választás (pl. 1 vagy 2 4 5): " CHOICES </dev/tty || CHOICES=""
+read -rp $'\e[37mVálasztás (pl. 1 vagy 2 4 5): \e[0m' CHOICES </dev/tty || CHOICES=""
 
+# Ha az 1-es opció van kiválasztva, mindent telepít
+if echo "$CHOICES" | grep -qw "1"; then
+  INSTALL_NODE_RED=1
+  INSTALL_LAMP=1
+  INSTALL_MQTT=1
+  INSTALL_MC=1
+fi
+
+# Egyéb opciók feldolgozása
 for c in $CHOICES; do
   case "$c" in
-    1)
-      INSTALL_NODE_RED=1
-      INSTALL_LAMP=1
-      INSTALL_MQTT=1
-      INSTALL_MC=1
-      ;;
     2) INSTALL_NODE_RED=1 ;;
     3) INSTALL_LAMP=1 ;;
     4) INSTALL_MQTT=1 ;;
     5) INSTALL_MC=1 ;;
-    *) echo "Ismeretlen opció: $c, kihagyva." ;;
   esac
 done
 
+# Ha nincs semmi kiválasztva, kilép
 if [[ $INSTALL_NODE_RED -eq 0 && $INSTALL_LAMP -eq 0 && $INSTALL_MQTT -eq 0 && $INSTALL_MC -eq 0 ]]; then
-  echo "Nem választottál semmit, kilépek."
+  echo -e "\e[33mNincs kiválasztva semmi, kilépés.\e[0m"
   exit 0
 fi
 
-# Frissítés és alap csomagok
+# Alaprendszer frissítés
 apt-get update -y && apt-get upgrade -y
 apt-get install -y curl wget unzip ca-certificates gnupg lsb-release
 
