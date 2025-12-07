@@ -9,6 +9,22 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
+clear
+echo -e "\e[36mMit szeretnél?\e[0m"
+echo -e "  \e[32m1\e[0m - Telepítés"
+echo -e "  \e[31m2\e[0m - Eltávolítás"
+read -rp $'\e[37mVálasztás (1/2): \e[0m' MODE </dev/tty || MODE=""
+
+if [[ "$MODE" != "1" && "$MODE" != "2" ]]; then
+  echo -e "\e[33mÉrvénytelen választás, kilépés.\e[0m"
+  exit 1
+fi
+
+########################################
+###    TELEPÍTÉSI ÜZEMMÓD           ####
+########################################
+if [[ "$MODE" == "1" ]]; then
+
 # Opciók alapértelmezett értékei
 INSTALL_NODE_RED=0
 INSTALL_LAMP=0
@@ -145,5 +161,70 @@ if [[ $INSTALL_MC -eq 1 ]]; then
   apt-get install -y mc
 fi
 
-# Végén a kiírás
 echo -e "\e[32mTelepítés kész!\e[0m"
+exit 0
+fi  # TELEPÍTÉS vége
+
+
+########################################
+###         TÖRLÉSI ÜZEMMÓD         ####
+########################################
+if [[ "$MODE" == "2" ]]; then
+
+REMOVE_NODE_RED=0
+REMOVE_LAMP=0
+REMOVE_MQTT=0
+REMOVE_MC=0
+
+echo -e "\e[31mMit szeretnél eltávolítani?\e[0m"
+echo -e "  \e[33m1\e[0m - MINDENT"
+echo -e "  \e[32m2\e[0m - Node-RED"
+echo -e "  \e[34m3\e[0m - LAMP (Apache2 + MariaDB + PHP + phpMyAdmin)"
+echo -e "  \e[35m4\e[0m - MQTT (Mosquitto)"
+echo -e "  \e[36m5\e[0m - mc"
+
+read -rp $'\e[37mVálasztás (pl. 1 vagy 2 4 5): \e[0m' DEL </dev/tty || DEL=""
+
+if echo "$DEL" | grep -qw "1"; then
+  REMOVE_NODE_RED=1
+  REMOVE_LAMP=1
+  REMOVE_MQTT=1
+  REMOVE_MC=1
+fi
+
+for d in $DEL; do
+  case "$d" in
+    2) REMOVE_NODE_RED=1 ;;
+    3) REMOVE_LAMP=1 ;;
+    4) REMOVE_MQTT=1 ;;
+    5) REMOVE_MC=1 ;;
+  esac
+done
+
+
+# Node-RED törlése
+if [[ $REMOVE_NODE_RED -eq 1 ]]; then
+  npm remove -g node-red || true
+  rm -f /etc/systemd/system/node-red.service
+  systemctl daemon-reload
+fi
+
+# LAMP törlése
+if [[ $REMOVE_LAMP -eq 1 ]]; then
+  apt-get purge -y apache2\* mariadb-server\* php\* 
+  rm -rf /usr/share/phpmyadmin /etc/apache2/conf-available/phpmyadmin.conf
+fi
+
+# MQTT törlése
+if [[ $REMOVE_MQTT -eq 1 ]]; then
+  apt-get purge -y mosquitto\*
+  rm -rf /etc/mosquitto
+fi
+
+# mc törlése
+if [[ $REMOVE_MC -eq 1 ]]; then
+  apt-get purge -y mc
+fi
+
+echo -e "\e[32mEltávolítás kész!\e[0m"
+fi
