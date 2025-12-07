@@ -22,7 +22,6 @@ echo -e "  \e[34m3\e[0m - Apache2 + MariaDB + PHP + phpMyAdmin"
 echo -e "  \e[35m4\e[0m - MQTT szerver (Mosquitto)"
 echo -e "  \e[36m5\e[0m - mc"
 
-
 read -rp $'\e[37mVálasztás (pl. 1 vagy 2 4 5): \e[0m' CHOICES </dev/tty || CHOICES=""
 
 # Ha az 1-es opció van kiválasztva, mindent telepít
@@ -145,3 +144,6 @@ fi
 if [[ $INSTALL_MC -eq 1 ]]; then
   apt-get install -y mc
 fi
+
+# Végén a kiírás
+echo -e "\e[32mTelepítés kész!\e[0m"
