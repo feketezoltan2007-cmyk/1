@@ -143,9 +143,14 @@ echo -e "\e[32mTelepítés kész!\e[0m"
 
 # Ellenőrizzük a szolgáltatások állapotát
 echo -e "\n\e[36mEllenőrizzük a szolgáltatások állapotát:\e[0m"
-for svc in apache2 mariadb mosquitto node-red; do
-    echo -e "\n\e[33m$svc szolgáltatás állapota:\e[0m"
-    systemctl status "$svc" --no-pager || echo -e "\e[31m$svc nincs telepítve vagy nincs service file.\e[0m"
+
+SERVICES=("apache2" "mariadb" "mosquitto" "node-red")
+
+for svc in "${SERVICES[@]}"; do
+    if systemctl list-units --type=service | grep -q "$svc"; then
+        echo -e "\n\e[33m$svc szolgáltatás állapota:\e[0m"
+        systemctl status "$svc" --no-pager
+    fi
 done
 
 exit 0
@@ -194,4 +199,40 @@ for d in $DEL; do
 done
 
 ########################################
-### KONKRÉT TÖRLÉSI LÉP
+### KONKRÉT TÖRLÉSI LÉPÉSEK
+########################################
+
+# Node-RED törlése
+if [[ $REMOVE_NODE_RED -eq 1 ]]; then
+  npm remove -g node-red || true
+fi
+
+# LAMP törlése
+if [[ $REMOVE_LAMP -eq 1 ]]; then
+  apt-get purge -y apache2\* mariadb-server\* php\*
+  rm -rf /usr/share/phpmyadmin
+fi
+
+# MQTT törlése
+if [[ $REMOVE_MQTT -eq 1 ]]; then
+  apt-get purge -y mosquitto\*
+fi
+
+# mc törlése
+if [[ $REMOVE_MC -eq 1 ]]; then
+  apt-get purge -y mc
+fi
+
+echo -e "\e[32mEltávolítás kész!\e[0m"
+
+# Ellenőrizzük a szolgáltatások állapotát törlés után
+echo -e "\n\e[36mEllenőrizzük a szolgáltatások állapotát:\e[0m"
+
+SERVICES=("apache2" "mariadb" "mosquitto" "node-red")
+
+for svc in "${SERVICES[@]}"; do
+    if systemctl list-units --type=service | grep -q "$svc"; then
+        echo -e "\n\e[33m$svc szolgáltatás állapota:\e[0m"
+        systemctl status "$svc" --no-pager
+    fi
+done
