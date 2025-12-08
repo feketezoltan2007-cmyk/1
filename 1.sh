@@ -133,10 +133,23 @@ echo -e "\e[32mTelepítés kész!\e[0m"
 
 echo -e "\e[36mSzolgáltatások állapotának ellenőrzése...\e[0m"
 
-[[ $INSTALL_NODE_RED -eq 1 ]] && systemctl status nodered.service --no-pager || true
-[[ $INSTALL_LAMP -eq 1 ]] && systemctl status apache2 --no-pager || true
-[[ $INSTALL_LAMP -eq 1 ]] && systemctl status mariadb --no-pager || true
-[[ $INSTALL_MQTT -eq 1 ]] && systemctl status mosquitto --no-pager || true
+if [[ $INSTALL_NODE_RED -eq 1 ]]; then
+  echo -e "\n--- Node-RED szolgáltatás ---"
+  systemctl status nodered.service || true
+fi
+
+if [[ $INSTALL_LAMP -eq 1 ]]; then
+  echo -e "\n--- Apache2 szolgáltatás ---"
+  systemctl status apache2 || true
+
+  echo -e "\n--- MariaDB szolgáltatás ---"
+  systemctl status mariadb || true
+fi
+
+if [[ $INSTALL_MQTT -eq 1 ]]; then
+  echo -e "\n--- Mosquitto szolgáltatás ---"
+  systemctl status mosquitto || true
+fi
 
 echo -e "\e[32mEllenőrzés kész!\e[0m"
 exit 0
@@ -220,10 +233,23 @@ echo -e "\e[32mEltávolítás kész!\e[0m"
 
 echo -e "\e[36mSzolgáltatások eltávolításának ellenőrzése...\e[0m"
 
-[[ $REMOVE_NODE_RED -eq 1 ]] && systemctl status nodered.service --no-pager || true
-[[ $REMOVE_LAMP -eq 1 ]] && systemctl status apache2 --no-pager || true
-[[ $REMOVE_LAMP -eq 1 ]] && systemctl status mariadb --no-pager || true
-[[ $REMOVE_MQTT -eq 1 ]] && systemctl status mosquitto --no-pager || true
+if [[ $REMOVE_NODE_RED -eq 1 ]]; then
+  echo -e "\n--- Node-RED szolgáltatás ---"
+  systemctl status nodered.service || true
+fi
+
+if [[ $REMOVE_LAMP -eq 1 ]]; then
+  echo -e "\n--- Apache2 szolgáltatás ---"
+  systemctl status apache2 || true
+
+  echo -e "\n--- MariaDB szolgáltatás ---"
+  systemctl status mariadb || true
+fi
+
+if [[ $REMOVE_MQTT -eq 1 ]]; then
+  echo -e "\n--- Mosquitto szolgáltatás ---"
+  systemctl status mosquitto || true
+fi
 
 echo -e "\e[32mEllenőrzés kész!\e[0m"
 
