@@ -62,7 +62,6 @@ if [[ "$MODE" != "1" && "$MODE" != "2" ]]; then
   exit 1
 fi
 
-
 ########################################
 ###              TELEPÍTÉS            ###
 ########################################
@@ -82,7 +81,7 @@ INSTALL_MC=0
 echo -e "\e[36mMit szeretnél telepíteni? \e[0m"
 echo -e "  \e[32m1\e[0m - MINDENT telepít"
 echo -e "  \e[33m2\e[0m - Node-RED            – $NODE_STATUS"
-echo -e "  \e[34m3\e[0m - Apache+MariaDB+PHP – $LAMP_STATUS"
+echo -e "  \e[94m3\e[0m - Apache+MariaDB+PHP – $LAMP_STATUS"
 echo -e "  \e[35m4\e[0m - MQTT (Mosquitto)   – $MQTT_STATUS"
 echo -e "  \e[36m5\e[0m - mc                  – $MC_STATUS"
 
@@ -141,10 +140,16 @@ if [[ $INSTALL_MC -eq 1 ]]; then
 fi
 
 echo -e "\e[32mTelepítés kész!\e[0m"
+
+# Ellenőrizzük a szolgáltatások állapotát
+echo -e "\n\e[36mEllenőrizzük a szolgáltatások állapotát:\e[0m"
+for svc in apache2 mariadb mosquitto node-red; do
+    echo -e "\n\e[33m$svc szolgáltatás állapota:\e[0m"
+    systemctl status "$svc" --no-pager || echo -e "\e[31m$svc nincs telepítve vagy nincs service file.\e[0m"
+done
+
 exit 0
 fi  # TELEPÍTÉS vége
-
-
 
 ########################################
 ###              TÖRLÉS               ###
@@ -165,7 +170,7 @@ REMOVE_MC=0
 echo -e "\e[31mMit szeretnél eltávolítani?\e[0m"
 echo -e "  \e[33m1\e[0m - MINDENT"
 echo -e "  \e[32m2\e[0m - Node-RED            – $NODE_STATUS"
-echo -e "  \e[34m3\e[0m - Apache+MariaDB+PHP – $LAMP_STATUS"
+echo -e "  \e[94m3\e[0m - Apache+MariaDB+PHP – $LAMP_STATUS"
 echo -e "  \e[35m4\e[0m - MQTT (Mosquitto)   – $MQTT_STATUS"
 echo -e "  \e[36m5\e[0m - mc                  – $MC_STATUS"
 
@@ -189,29 +194,4 @@ for d in $DEL; do
 done
 
 ########################################
-### KONKRÉT TÖRLÉSI LÉPÉSEK
-########################################
-
-# Node-RED törlése
-if [[ $REMOVE_NODE_RED -eq 1 ]]; then
-  npm remove -g node-red || true
-fi
-
-# LAMP törlése
-if [[ $REMOVE_LAMP -eq 1 ]]; then
-  apt-get purge -y apache2\* mariadb-server\* php\*
-  rm -rf /usr/share/phpmyadmin
-fi
-
-# MQTT törlése
-if [[ $REMOVE_MQTT -eq 1 ]]; then
-  apt-get purge -y mosquitto\*
-fi
-
-# mc törlése
-if [[ $REMOVE_MC -eq 1 ]]; then
-  apt-get purge -y mc
-fi
-
-echo -e "\e[32mEltávolítás kész!\e[0m"
-fi
+### KONKRÉT TÖRLÉSI LÉP
