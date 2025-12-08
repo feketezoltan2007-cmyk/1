@@ -15,20 +15,34 @@ fi
 is_installed() {
   case "$1" in
     node-red)
-      if command -v node-red >/dev/null 2>&1; then echo "telepítve"; else echo "nincs telepítve"; fi
+      if command -v node-red >/dev/null 2>&1; then
+        echo "telepítve"
+      else
+        echo "nincs telepítve"
+      fi
       ;;
     lamp)
-      if dpkg -l apache2 >/dev/null 2>&1 && dpkg -l mariadb-server >/dev/null 2>&1 && dpkg -l php >/dev/null 2>&1; then
+      if dpkg -s apache2 2>/dev/null | grep -q "Status: install ok installed" \
+      && dpkg -s mariadb-server 2>/dev/null | grep -q "Status: install ok installed" \
+      && dpkg -s php 2>/dev/null | grep -q "Status: install ok installed"; then
         echo "telepítve"
       else
         echo "nincs telepítve"
       fi
       ;;
     mqtt)
-      if dpkg -l mosquitto >/dev/null 2>&1; then echo "telepítve"; else echo "nincs telepítve"; fi
+      if dpkg -s mosquitto 2>/dev/null | grep -q "Status: install ok installed"; then
+        echo "telepítve"
+      else
+        echo "nincs telepítve"
+      fi
       ;;
     mc)
-      if dpkg -l mc >/dev/null 2>&1; then echo "telepítve"; else echo "nincs telepítve"; fi
+      if dpkg -s mc 2>/dev/null | grep -q "Status: install ok installed"; then
+        echo "telepítve"
+      else
+        echo "nincs telepítve"
+      fi
       ;;
   esac
 }
@@ -47,6 +61,7 @@ if [[ "$MODE" != "1" && "$MODE" != "2" ]]; then
   echo -e "\e[33mÉrvénytelen választás, kilépés.\e[0m"
   exit 1
 fi
+
 
 ########################################
 ###              TELEPÍTÉS            ###
@@ -67,7 +82,7 @@ INSTALL_MC=0
 echo -e "\e[36mMit szeretnél telepíteni? \e[0m"
 echo -e "  \e[32m1\e[0m - MINDENT telepít"
 echo -e "  \e[33m2\e[0m - Node-RED            – $NODE_STATUS"
-echo -e "  \e[94m3\e[0m - Apache+MariaDB+PHP – $LAMP_STATUS"
+echo -e "  \e[34m3\e[0m - Apache+MariaDB+PHP – $LAMP_STATUS"
 echo -e "  \e[35m4\e[0m - MQTT (Mosquitto)   – $MQTT_STATUS"
 echo -e "  \e[36m5\e[0m - mc                  – $MC_STATUS"
 
@@ -126,32 +141,6 @@ if [[ $INSTALL_MC -eq 1 ]]; then
 fi
 
 echo -e "\e[32mTelepítés kész!\e[0m"
-
-########################################
-### SYSTEMCTL ELLENŐRZÉS (TELEPÍTÉS)
-########################################
-
-echo -e "\e[36mSzolgáltatások állapotának ellenőrzése...\e[0m"
-
-if [[ $INSTALL_NODE_RED -eq 1 ]]; then
-  echo -e "\n--- Node-RED szolgáltatás ---"
-  systemctl status nodered.service || true
-fi
-
-if [[ $INSTALL_LAMP -eq 1 ]]; then
-  echo -e "\n--- Apache2 szolgáltatás ---"
-  systemctl status apache2 || true
-
-  echo -e "\n--- MariaDB szolgáltatás ---"
-  systemctl status mariadb || true
-fi
-
-if [[ $INSTALL_MQTT -eq 1 ]]; then
-  echo -e "\n--- Mosquitto szolgáltatás ---"
-  systemctl status mosquitto || true
-fi
-
-echo -e "\e[32mEllenőrzés kész!\e[0m"
 exit 0
 fi  # TELEPÍTÉS vége
 
@@ -176,7 +165,7 @@ REMOVE_MC=0
 echo -e "\e[31mMit szeretnél eltávolítani?\e[0m"
 echo -e "  \e[33m1\e[0m - MINDENT"
 echo -e "  \e[32m2\e[0m - Node-RED            – $NODE_STATUS"
-echo -e "  \e[94m3\e[0m - Apache+MariaDB+PHP – $LAMP_STATUS"
+echo -e "  \e[34m3\e[0m - Apache+MariaDB+PHP – $LAMP_STATUS"
 echo -e "  \e[35m4\e[0m - MQTT (Mosquitto)   – $MQTT_STATUS"
 echo -e "  \e[36m5\e[0m - mc                  – $MC_STATUS"
 
@@ -225,32 +214,4 @@ if [[ $REMOVE_MC -eq 1 ]]; then
 fi
 
 echo -e "\e[32mEltávolítás kész!\e[0m"
-
-
-########################################
-### SYSTEMCTL ELLENŐRZÉS (TÖRLÉS)
-########################################
-
-echo -e "\e[36mSzolgáltatások eltávolításának ellenőrzése...\e[0m"
-
-if [[ $REMOVE_NODE_RED -eq 1 ]]; then
-  echo -e "\n--- Node-RED szolgáltatás ---"
-  systemctl status nodered.service || true
-fi
-
-if [[ $REMOVE_LAMP -eq 1 ]]; then
-  echo -e "\n--- Apache2 szolgáltatás ---"
-  systemctl status apache2 || true
-
-  echo -e "\n--- MariaDB szolgáltatás ---"
-  systemctl status mariadb || true
-fi
-
-if [[ $REMOVE_MQTT -eq 1 ]]; then
-  echo -e "\n--- Mosquitto szolgáltatás ---"
-  systemctl status mosquitto || true
-fi
-
-echo -e "\e[32mEllenőrzés kész!\e[0m"
-
 fi
