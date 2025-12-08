@@ -67,7 +67,7 @@ INSTALL_MC=0
 echo -e "\e[36mMit szeretnél telepíteni? \e[0m"
 echo -e "  \e[32m1\e[0m - MINDENT telepít"
 echo -e "  \e[33m2\e[0m - Node-RED            – $NODE_STATUS"
-echo -e "  \e[34m3\e[0m - Apache+MariaDB+PHP – $LAMP_STATUS"
+echo -e "  \e[94m3\e[0m - Apache+MariaDB+PHP – $LAMP_STATUS"
 echo -e "  \e[35m4\e[0m - MQTT (Mosquitto)   – $MQTT_STATUS"
 echo -e "  \e[36m5\e[0m - mc                  – $MC_STATUS"
 
@@ -126,6 +126,19 @@ if [[ $INSTALL_MC -eq 1 ]]; then
 fi
 
 echo -e "\e[32mTelepítés kész!\e[0m"
+
+########################################
+### SYSTEMCTL ELLENŐRZÉS (TELEPÍTÉS)
+########################################
+
+echo -e "\e[36mSzolgáltatások állapotának ellenőrzése...\e[0m"
+
+[[ $INSTALL_NODE_RED -eq 1 ]] && systemctl status nodered.service --no-pager || true
+[[ $INSTALL_LAMP -eq 1 ]] && systemctl status apache2 --no-pager || true
+[[ $INSTALL_LAMP -eq 1 ]] && systemctl status mariadb --no-pager || true
+[[ $INSTALL_MQTT -eq 1 ]] && systemctl status mosquitto --no-pager || true
+
+echo -e "\e[32mEllenőrzés kész!\e[0m"
 exit 0
 fi  # TELEPÍTÉS vége
 
@@ -150,7 +163,7 @@ REMOVE_MC=0
 echo -e "\e[31mMit szeretnél eltávolítani?\e[0m"
 echo -e "  \e[33m1\e[0m - MINDENT"
 echo -e "  \e[32m2\e[0m - Node-RED            – $NODE_STATUS"
-echo -e "  \e[34m3\e[0m - Apache+MariaDB+PHP – $LAMP_STATUS"
+echo -e "  \e[94m3\e[0m - Apache+MariaDB+PHP – $LAMP_STATUS"
 echo -e "  \e[35m4\e[0m - MQTT (Mosquitto)   – $MQTT_STATUS"
 echo -e "  \e[36m5\e[0m - mc                  – $MC_STATUS"
 
@@ -199,4 +212,19 @@ if [[ $REMOVE_MC -eq 1 ]]; then
 fi
 
 echo -e "\e[32mEltávolítás kész!\e[0m"
+
+
+########################################
+### SYSTEMCTL ELLENŐRZÉS (TÖRLÉS)
+########################################
+
+echo -e "\e[36mSzolgáltatások eltávolításának ellenőrzése...\e[0m"
+
+[[ $REMOVE_NODE_RED -eq 1 ]] && systemctl status nodered.service --no-pager || true
+[[ $REMOVE_LAMP -eq 1 ]] && systemctl status apache2 --no-pager || true
+[[ $REMOVE_LAMP -eq 1 ]] && systemctl status mariadb --no-pager || true
+[[ $REMOVE_MQTT -eq 1 ]] && systemctl status mosquitto --no-pager || true
+
+echo -e "\e[32mEllenőrzés kész!\e[0m"
+
 fi
